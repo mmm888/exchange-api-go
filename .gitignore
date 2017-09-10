@@ -1,0 +1,8 @@
+# gogland
+.idea
+
+# private file
+secret.go
+
+# executable file
+oanda-api-go
