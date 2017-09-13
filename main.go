@@ -1,71 +1,98 @@
 package main
 
 import (
-	"bufio"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
 	"time"
 )
 
-//{"tick":{"instrument":"USD_JPY","time":"2017-09-08T20:59:58.315562Z","bid":107.832,"ask":107.858}}
-//{"heartbeat":{"time":"2017-09-11T07:12:35.258498Z"}}
-
-type Dummy struct {
-	HeartBeart struct {
-		Time time.Time `json:"time"`
-	} `json:"heartbeat""`
-}
-
-type Change struct {
-	Tick struct {
-		PairCode string    `json:"instrument"`
-		Time     time.Time `json:"time"`
-		Bid      float64   `json:"bid"`
-		Ask      float64   `json:"ask"`
-	} `json:tick`
-}
-
 var (
 	streamURL = "https://stream-fxpractice.oanda.com/v1/prices"
+	pastURL   = "https://api-fxpractice.oanda.com/v1/candles"
 )
 
-func main() {
+func OANDARequest(URL string, option ...string) (*http.Response, error) {
+	paircode := option[0]
+	layout := "2006-01-02 15:04:05"
+	var start, end time.Time
+	if len(option) == 3 {
+		start, _ = time.Parse(layout, option[1])
+		end, _ = time.Parse(layout, option[2])
+	}
+
 	values := url.Values{}
 	values.Set("accountId", userID)
-	values.Add("instruments", "USD_JPY")
 
-	req, _ := http.NewRequest("GET", streamURL, nil)
+	if URL == streamURL {
+		values.Add("instruments", paircode)
+	} else if URL == pastURL {
+		values.Add("instrument", paircode)
+	}
+
+	if !start.IsZero() {
+		values.Add("start", fmt.Sprint(start.Format(time.RFC3339)))
+	}
+
+	if !end.IsZero() {
+		values.Add("end", fmt.Sprint(end.Format(time.RFC3339)))
+	}
+
+	req, _ := http.NewRequest("GET", URL, nil)
 	req.Header.Set("Authorization", "Bearer "+token)
 	req.URL.RawQuery = values.Encode()
 
 	client := new(http.Client)
 	resp, err := client.Do(req)
+
+	return resp, err
+}
+
+type PastData struct {
+	PairCode    string `json:"instrument"`
+	Granularity string `json:"granularity"`
+	Candles     []struct {
+		Time     time.Time `json:time`
+		OpenBid  float64   `json:openBid`
+		OpenAsk  float64   `json:openAsk`
+		HighBid  float64   `json:highBid`
+		HighAsk  float64   `json:highAsk`
+		LowBid   float64   `json:lowBid`
+		LowAsk   float64   `json:lowAsk`
+		CloseBid float64   `json:closeBid`
+		CloseAsk float64   `json:closeAsk`
+		Volume   int       `json:volume`
+		Complete bool      `json:complete`
+	} `json:"candles"`
+}
+
+func GetData(c chan PastData, code, start, end string) {
+	resp, err := OANDARequest(pastURL, code, start, end)
 	if err != nil {
-		log.Printf("Cannot get resp: %v", err)
+		log.Printf("Cannot get body: %v", err)
 	}
 	defer resp.Body.Close()
 
-	reader := bufio.NewReader(resp.Body)
-	var c Change
-	var d Dummy
-	var prevtime time.Time
-	var count int
-	for {
-		line, _ := reader.ReadBytes('\n')
-		err := json.Unmarshal(line, &d)
-		if err != nil {
-			log.Printf("Cannot decode json to Dummy: %v", err)
-		}
-		if prevtime == d.HeartBeart.Time {
-			err = json.Unmarshal(line, &c)
-			if err != nil {
-				log.Printf("Cannot decode json to Change: %v", err)
-			}
-			fmt.Println(c)
-		}
-		prevtime = d.HeartBeart.Time
+	body, _ := ioutil.ReadAll(resp.Body)
+	var data PastData
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		log.Printf("Cannot decode json: %v", err)
 	}
+	fmt.Println(data)
+}
+
+func main() {
+	c := make(chan PastData)
+	GetData(c, "USD_JPY", "2016-06-03 15:20:33", "2016-06-03 15:23:33")
+	/*
+		d := new(OANDAStreamData)
+		SetData(d, "USD_JPY")
+		for {
+			fmt.Println(<-d.c)
+		}
+	*/
 }
