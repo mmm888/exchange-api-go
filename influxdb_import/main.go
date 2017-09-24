@@ -14,6 +14,7 @@ var (
 	// influxdb
 	db    = "exchange"
 	table = "USDJPY"
+	api   = "oanda"
 )
 
 func main() {
@@ -26,7 +27,7 @@ func main() {
 	exportdata += fmt.Sprintf("# DML\n")
 	exportdata += fmt.Sprintf("# CONTEXT-DATABASE: %s\n", db)
 	for _, v := range d.Candles {
-		exportdata += fmt.Sprintf("%s,bid=%f ask=%f %d\n", table, v.OpenBid, v.OpenAsk, v.Time.Unix())
+		exportdata += fmt.Sprintf("%s,api=%s bid=%f,ask=%f %d\n", table, api, v.OpenBid, v.OpenAsk, v.Time.Unix())
 	}
 
 	fmt.Println(exportdata)
