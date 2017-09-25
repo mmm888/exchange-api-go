@@ -12,6 +12,10 @@ var (
 	start       = "2014-06"
 	end         = "2017-06"
 	granularity = "D"
+	layout      = "2006-01"
+	//start       = "2016-06-03 5:53:09"
+	//end         = "2016-06-03 15:40:33"
+	//layout = "2006-01-02 15:04:05"
 
 	// influxdb
 	db    = "exchange"
@@ -24,7 +28,7 @@ func main() {
 	//	d := exchange.GetData(code, start, end)
 
 	d := new(exchange.OANDAPastData)
-	d.SetData(code, start, end, granularity)
+	d.SetData(layout, code, start, end, granularity)
 	data := d.GetData()
 
 	var text string

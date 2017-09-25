@@ -1,9 +1,7 @@
 package exchange
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
@@ -12,6 +10,7 @@ import (
 
 type OANDAPastData struct {
 	url         string
+	layout      string
 	pairCode    string
 	start       string
 	end         string
@@ -36,8 +35,9 @@ type PastData struct {
 	} `json:"candles"`
 }
 
-func (pd *OANDAPastData) SetData(pairCode, start, end, granularity string) {
+func (pd *OANDAPastData) SetData(layout, pairCode, start, end, granularity string) {
 	pd.url = pastURL
+	pd.layout = layout
 	pd.pairCode = pairCode
 	pd.start = start
 	pd.end = end
@@ -45,13 +45,11 @@ func (pd *OANDAPastData) SetData(pairCode, start, end, granularity string) {
 }
 
 func (pd *OANDAPastData) GetResponse() (*http.Response, error) {
-	//	layout := "2006-01-02 15:04:05"
-	layout := "2006-01"
-	s, err := time.Parse(layout, pd.start)
+	s, err := time.Parse(pd.layout, pd.start)
 	if err != nil {
 		return nil, err
 	}
-	e, err := time.Parse(layout, pd.end)
+	e, err := time.Parse(pd.layout, pd.end)
 	if err != nil {
 		return nil, err
 	}
@@ -91,15 +89,10 @@ func (pd *OANDAPastData) GetData() PastData {
 	}
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Printf("Cannot read body: %v", err)
-	}
-
 	var data PastData
-	err = json.Unmarshal(body, &data)
+	err = GetUnmarshal(resp.Body, &data)
 	if err != nil {
-		log.Printf("Cannot decode json: %v", err)
+		log.Printf("Cannot get unmarshal data: %v", err)
 	}
 
 	return data
