@@ -19,7 +19,7 @@ type PairList struct {
 		MarginRate      float64 `json:"marginRate"`
 		Halted          bool    `json:"halted"`
 	} `json:"instruments"`
-}s
+}
 
 type OANDAPairList struct {
 	url         string
