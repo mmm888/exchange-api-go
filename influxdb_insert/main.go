@@ -4,23 +4,25 @@ import (
 	"log"
 
 	client "github.com/influxdata/influxdb/client/v2"
-	"github.com/mmm888/exchange-api-go"
-)
-
-var (
-	code = []string{
-		"USD_JPY",
-	}
+	exchange "github.com/mmm888/exchange-api-go"
 )
 
 const (
 	MyDB     = "exchange"
+	Mytag    = "oanda"
 	host     = "http://localhost:8086"
 	username = ""
 	password = ""
 )
 
-//curl -i -XPOST "http://localhost:8086/write?db=science_is_cool" --data-binary 'weather,location=us-midwest temperature=82 1465839830100400200'
+var (
+	// oanda-api
+	code        = "USD_JPY"
+	start       = "2015-09-25"
+	end         = "2017-09-25"
+	granularity = "H3"
+	layout      = "2006-01-02"
+)
 
 func main() {
 	// Create a new HTTPClient
@@ -42,22 +44,18 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Get streaming data
-	d := new(exchange.OANDAStreamData)
-	d.SetData(code)
-	d.GetData()
-	var data exchange.StreamingData
-	for {
-		data = <-d.Chan
-
+	d := new(exchange.OANDAPastData)
+	d.SetData(layout, code, start, end, granularity)
+	data := d.GetData()
+	for _, v := range data.Candles {
 		// Create a point and add to batch
-		tags := map[string]string{"api": "oanda"}
+		tags := map[string]string{"api": Mytag}
 		fields := map[string]interface{}{
-			"ask": data.Tick.Ask,
-			"bid": data.Tick.Bid,
+			"ask": v.OpenAsk,
+			"bid": v.OpenBid,
 		}
 
-		pt, err := client.NewPoint(data.Tick.PairCode, tags, fields, data.Tick.Time)
+		pt, err := client.NewPoint(data.PairCode, tags, fields, v.Time)
 		if err != nil {
 			log.Printf("Cannot get streaming data: %v", err)
 		}

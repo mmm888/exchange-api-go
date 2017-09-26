@@ -1,0 +1,1 @@
+insert past data for influxdb
