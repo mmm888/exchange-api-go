@@ -2,15 +2,16 @@ package exchange
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 type CurrentData struct {
-	Prices []struct {
+	Prices [100]struct {
 		Instrument string    `json:"instrument"`
 		Time       time.Time `json:"time"`
 		Bid        float64   `json:"bid"`
@@ -33,20 +34,20 @@ func (cd *OANDACurrentData) SetData(instruments []string, layout, since string) 
 	cd.since = since
 }
 
-func (cd *OANDACurrentData) GetData() CurrentData {
+func (cd *OANDACurrentData) GetData() (*CurrentData, error) {
 	resp, err := cd.GetResponse()
 	if err != nil {
-		log.Printf("Cannot get body: %v", err)
+		return nil, errors.Wrap(err, "Error1 at CurrentData")
 	}
 	defer resp.Body.Close()
 
 	var data CurrentData
 	err = GetUnmarshal(resp.Body, &data)
 	if err != nil {
-		log.Printf("Cannot get unmarshal data: %v", err)
+		return nil, errors.Wrap(err, "Error2 at CurrentData")
 	}
 
-	return data
+	return &data, nil
 }
 
 func (cd *OANDACurrentData) GetResponse() (*http.Response, error) {
@@ -57,14 +58,14 @@ func (cd *OANDACurrentData) GetResponse() (*http.Response, error) {
 	if cd.since != "" {
 		s, err := time.Parse(cd.layout, cd.since)
 		if err != nil {
-			return nil, err
+			return nil, &ParseTimeError{}
 		}
 		values.Add("since", fmt.Sprint(s.Format(time.RFC3339)))
 	}
 
 	req, err := http.NewRequest("GET", cd.url, nil)
 	if err != nil {
-		return nil, err
+		return nil, &CreateReqError{}
 	}
 	req.Header.Set("Authorization", "Bearer "+token)
 	req.URL.RawQuery = values.Encode()
@@ -72,7 +73,7 @@ func (cd *OANDACurrentData) GetResponse() (*http.Response, error) {
 	client := new(http.Client)
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, &GetRespError{}
 	}
 
 	return resp, nil

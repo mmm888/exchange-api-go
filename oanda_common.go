@@ -16,12 +16,12 @@ var (
 func GetUnmarshal(respBody io.ReadCloser, data interface{}) error {
 	body, err := ioutil.ReadAll(respBody)
 	if err != nil {
-		return err
+		return &ReadBodyError{}
 	}
 
 	err = json.Unmarshal(body, data)
 	if err != nil {
-		return err
+		return &UnmarshalError{}
 	}
 
 	return nil

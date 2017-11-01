@@ -2,11 +2,20 @@ package exchange
 
 import (
 	"testing"
+
+	"log"
+
+	"github.com/pkg/errors"
 )
 
 func TestOANDAPairList_GetData(t *testing.T) {
-	var f, i []string
-	f = []string{
+	var checkPairList = &PairList{}
+	var instruments = []string{
+		"USD_JPY",
+		"EUR_JPY",
+		"EUR_USD",
+	}
+	var fields = []string{
 		"instrument",
 		"displayName",
 		"pip",
@@ -17,14 +26,18 @@ func TestOANDAPairList_GetData(t *testing.T) {
 		"marginRate",
 		"halted",
 	}
-	i = []string{
-		"AUD_CAD",
-		"AUD_CHF",
-		"USD_JPY",
-	}
 
 	d := new(OANDAPairList)
-	d.SetData(i, f)
-	data := d.GetData()
-	t.Log(data)
+	d.SetData(instruments, fields)
+	p, err := d.GetData()
+
+	if *p == *checkPairList {
+		t.Error("PairList is nil")
+	}
+
+	if err != nil {
+		t.Error(errors.Wrap(err, "Error1 at TestOANDAPairList_GetData"))
+	}
+
+	log.Print("PairList test finished")
 }

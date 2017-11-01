@@ -1,14 +1,15 @@
 package exchange
 
 import (
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 type PairList struct {
-	Instruments []struct {
+	Instruments [100]struct {
 		Instrument      string  `json:"instrument"`
 		DisplayName     string  `json:"displayName"`
 		Pip             string  `json:"pip"`
@@ -33,6 +34,22 @@ func (pl *OANDAPairList) SetData(instruments, fields []string) {
 	pl.fields = fields
 }
 
+func (pl *OANDAPairList) GetData() (*PairList, error) {
+	resp, err := pl.GetResponse()
+	if err != nil {
+		return nil, errors.Wrap(err, "Error1 at PairList")
+	}
+	defer resp.Body.Close()
+
+	var data PairList
+	err = GetUnmarshal(resp.Body, &data)
+	if err != nil {
+		return nil, errors.Wrap(err, "Error2 at PairList")
+	}
+
+	return &data, nil
+}
+
 func (pl *OANDAPairList) GetResponse() (*http.Response, error) {
 	values := url.Values{}
 	values.Set("accountId", userID)
@@ -46,7 +63,7 @@ func (pl *OANDAPairList) GetResponse() (*http.Response, error) {
 
 	req, err := http.NewRequest("GET", pl.url, nil)
 	if err != nil {
-		return nil, err
+		return nil, &CreateReqError{}
 	}
 	req.Header.Set("Authorization", "Bearer "+token)
 	req.URL.RawQuery = values.Encode()
@@ -54,24 +71,8 @@ func (pl *OANDAPairList) GetResponse() (*http.Response, error) {
 	client := new(http.Client)
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, &GetRespError{}
 	}
 
 	return resp, nil
-}
-
-func (pl *OANDAPairList) GetData() PairList {
-	resp, err := pl.GetResponse()
-	if err != nil {
-		log.Printf("Cannot get body: %v", err)
-	}
-	defer resp.Body.Close()
-
-	var data PairList
-	err = GetUnmarshal(resp.Body, &data)
-	if err != nil {
-		log.Printf("Cannot get unmarshal data: %v", err)
-	}
-
-	return data
 }
