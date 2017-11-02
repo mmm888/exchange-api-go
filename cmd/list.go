@@ -2,37 +2,42 @@ package main
 
 import (
 	"fmt"
+	"log"
 
-	"strings"
-
-	"github.com/mmm888/exchange-api-go"
+	ex "github.com/mmm888/exchange-api-go"
 )
 
 type List struct{}
 
 func (l *List) Help() string {
-	return "Usage: otoi list"
+	return "Usage: goanda list"
 }
 
 func (l *List) Run(args []string) int {
 	fields := []string{
 		"instrument",
-		"displayName",
 	}
 
-	d := new(exchange.OANDAPairList)
+	d := new(ex.OANDAPairList)
 	d.SetData(nil, fields)
-	data := d.GetData()
-
-	list := make([]string, 0, 20)
-	for _, v := range data.Instruments {
-		list = append(list, v.Instrument)
+	data, err := d.GetData()
+	if err != nil {
+		log.Print(err)
+		return 1
 	}
-	fmt.Println(strings.Join(list, " "))
+
+	checkNil := &ex.PairList{}
+	for _, v := range data.Instruments {
+		if v == checkNil.Instruments[0] {
+			break
+		}
+
+		fmt.Println(v.Instrument)
+	}
 
 	return 0
 }
 
 func (l *List) Synopsis() string {
-	return "Show exchange list"
+	return "Show a list of pair code"
 }

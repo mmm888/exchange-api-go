@@ -6,3 +6,6 @@ secret.go
 
 # executable file
 oanda-api-go
+
+# vendor directory
+vendor/*

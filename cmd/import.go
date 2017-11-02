@@ -1,5 +1,6 @@
 package main
 
+/*
 import (
 	"fmt"
 
@@ -39,7 +40,6 @@ func (i *Import) Run(args []string) int {
 
 	fmt.Println(data)
 
-	/*
 		var text string
 		text = fmt.Sprintf("# DDL\n")
 		text += fmt.Sprintf("CREATE DATABASE %s\n\n", db)
@@ -50,11 +50,10 @@ func (i *Import) Run(args []string) int {
 		}
 
 		fmt.Println(text)
-	*/
-
 	return 0
 }
 
 func (i *Import) Synopsis() string {
 	return "Show import data for Influxdb"
 }
+*/

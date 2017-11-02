@@ -1,5 +1,6 @@
 package main
 
+/*
 import (
 	"strings"
 
@@ -41,3 +42,4 @@ func (g *Get) Run(args []string) int {
 func (g *Get) Synopsis() string {
 	return "Show current value"
 }
+*/

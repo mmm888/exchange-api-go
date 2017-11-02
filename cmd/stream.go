@@ -1,5 +1,6 @@
 package main
 
+/*
 import (
 	"fmt"
 	"log"
@@ -39,3 +40,4 @@ func (s *Stream) Run(args []string) int {
 func (s *Stream) Synopsis() string {
 	return "Insert streaming data for influxdb"
 }
+*/

@@ -1,5 +1,6 @@
 package main
 
+/*
 import (
 	"fmt"
 	"log"
@@ -43,3 +44,4 @@ func (i *Insert) Run(args []string) int {
 func (i *Insert) Synopsis() string {
 	return "Insert data for influxdb"
 }
+*/
