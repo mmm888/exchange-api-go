@@ -4,28 +4,24 @@ import (
 	"log"
 	"os"
 
-	"github.com/BurntSushi/toml"
+	"github.com/influxdata/influxdb/client/v2"
 	"github.com/mitchellh/cli"
 )
 
-type Config struct {
-	DB          string
-	Tag         string
-	Host        string
-	Layout      string
-	Granularity string
-}
-
 var (
-	config Config
+	addr        = "db"
+	port        = "8086"
+	db          = "goanda"
+	code        = []string{"USD_JPY"}
+	layout      = "2006-01-02"
+	start       = "2016-01-01"
+	end         = "2020-01-31"
+	granularity = "H3"
+
+	clnt client.Client
 )
 
 func main() {
-	_, err := toml.DecodeFile("config.toml", &config)
-	if err != nil {
-		log.Printf("Cannot get config: %v", err)
-	}
-
 	c := cli.NewCLI("goanda", "1.0.0")
 	c.Args = os.Args[1:]
 	c.Commands = map[string]cli.CommandFactory{
@@ -41,17 +37,18 @@ func main() {
 		"streaming": func() (cli.Command, error) {
 			return &Streaming{}, nil
 		},
-		/*
-			"influxdb init": func() (cli.Command, error) {
-				return &InfluxInit{}, nil
-			},
-				"influxdb insert": func() (cli.Command, error) {
-					return &InfluxInsert{}, nil
-				},
-				"influxdb streaming": func() (cli.Command, error) {
-					return &InfluxStreaming{}, nil
-				},
-		*/
+		"influxdb": func() (cli.Command, error) {
+			return &Influx{}, nil
+		},
+		"influxdb init": func() (cli.Command, error) {
+			return &InfluxInit{}, nil
+		},
+		"influxdb past": func() (cli.Command, error) {
+			return &InfluxPast{}, nil
+		},
+		"influxdb streaming": func() (cli.Command, error) {
+			return &InfluxStreaming{}, nil
+		},
 	}
 
 	exitStatus, err := c.Run()

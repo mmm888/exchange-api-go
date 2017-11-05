@@ -1,5 +1,0 @@
-db="exchange"
-tag="oanda"
-host="localhost:8086"
-layout="2006-01"
-granularity="D"

@@ -22,7 +22,7 @@ func (l *List) Run(args []string) int {
 	d.SetData(nil, fields)
 	data, err := d.GetData()
 	if err != nil {
-		log.Print(err)
+		log.Printf("Error: %s", err)
 		return 1
 	}
 
