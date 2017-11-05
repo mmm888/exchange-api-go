@@ -38,5 +38,6 @@ Available commands are:
 
 ## TODO
 
+* Add test code
 * Add Option for "list, current, past, streaming"
 * Get more than 5000 past data for "oanda past"
