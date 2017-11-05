@@ -28,16 +28,6 @@ func (i *InfluxPast) Run(args []string) int {
 	getEnv()
 	getHTTPClient()
 
-	pairCode := code[0]
-
-	d := new(ex.OANDAPastData)
-	d.SetData(layout, pairCode, start, end, granularity)
-	data, err := d.GetData()
-	if err != nil {
-		log.Printf("Error: %s", err)
-		return 1
-	}
-
 	// Create a new point batch
 	bp, err := client.NewBatchPoints(client.BatchPointsConfig{
 		Database:  db,
@@ -48,26 +38,38 @@ func (i *InfluxPast) Run(args []string) int {
 		return 1
 	}
 
-	checkNil := &ex.PastData{}
-	for _, v := range data.Candles {
-		if v == checkNil.Candles[0] {
-			break
-		}
+	for _, pairCode := range code {
 
-		// Create a point and add to batch
-		//tags:=map[string]string{"api":"oanda"}
-		fields := map[string]interface{}{
-			"Ask": v.OpenAsk,
-			"Bid": v.OpenBid,
-		}
-
-		pt, err := client.NewPoint(pairCode, nil, fields, v.Time)
+		d := new(ex.OANDAPastData)
+		d.SetData(layout, pairCode, start, end, granularity)
+		data, err := d.GetData()
 		if err != nil {
 			log.Printf("Error: %s", err)
 			return 1
 		}
 
-		bp.AddPoint(pt)
+		checkNil := &ex.PastData{}
+
+		for _, v := range data.Candles {
+			if v == checkNil.Candles[0] {
+				break
+			}
+
+			// Create a point and add to batch
+			//tags:=map[string]string{"api":"oanda"}
+			fields := map[string]interface{}{
+				"Ask": v.OpenAsk,
+				"Bid": v.OpenBid,
+			}
+
+			pt, err := client.NewPoint(pairCode, nil, fields, v.Time)
+			if err != nil {
+				log.Printf("Error: %s", err)
+				return 1
+			}
+
+			bp.AddPoint(pt)
+		}
 	}
 
 	// Write the batch

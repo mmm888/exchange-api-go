@@ -1,6 +1,6 @@
-# oanda-api-go
+# exchange-api-go
 
-oanda-api-go is Go wrapper for the OANDA API
+exchange-api-go is Go wrapper for the OANDA API
 
 * OANDA API Document
   * http://developer.oanda.com/rest-live/development-guide/
@@ -17,7 +17,7 @@ package main
 
 var (
     userID = "REPLACE THIS WITH YOUR ACCOUNT ID, ie 1234567"
-    token= "REPLACE THIS WITH YOUR ACCESS TOKEN"
+    token  = "REPLACE THIS WITH YOUR ACCESS TOKEN"
 )
 ~~~
 

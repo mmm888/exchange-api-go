@@ -3,8 +3,8 @@ version: '2'
 services:
     cmd:
         depends_on:
-            - db
+            - influxdb
         build: "."
-    db:
+    influxdb:
         image: influxdb:1.3
 

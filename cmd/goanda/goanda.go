@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	addr        = "db"
+	addr        = "influxdb"
 	port        = "8086"
 	db          = "goanda"
 	code        = []string{"USD_JPY"}
