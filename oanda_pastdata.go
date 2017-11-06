@@ -13,8 +13,8 @@ type OANDAPastData struct {
 	url         string
 	layout      string
 	pairCode    string
-	start       string
-	end         string
+	start       time.Time
+	end         time.Time
 	granularity string
 }
 
@@ -38,52 +38,84 @@ type Candle struct {
 	Complete bool      `json:complete`
 }
 
-func (pd *OANDAPastData) SetData(layout, pairCode, start, end, granularity string) {
+func (pd *OANDAPastData) SetData(layout, pairCode, start, end, granularity string) error {
+	var err error
 	pd.url = pastURL
 	pd.layout = layout
 	pd.pairCode = pairCode
-	pd.start = start
-	pd.end = end
 	pd.granularity = granularity
+
+	pd.start, err = time.Parse(pd.layout, start)
+	if err != nil {
+		return &ParseTimeError{}
+	}
+	pd.end, err = time.Parse(pd.layout, end)
+	if err != nil {
+		return &ParseTimeError{}
+	}
+
+	return nil
 }
 
 func (pd *OANDAPastData) GetData() (*PastData, error) {
-	resp, err := pd.GetResponse()
-	if err != nil {
-		return nil, errors.Wrap(err, "Error1 at PastData")
-	}
-	defer resp.Body.Close()
+	// 5000 件以上返ってくる場合、nil を返すので。1 年ごとに値を取得する
+	// 1 年ごとの場合、Granularity=H2 まで値を取得できる (Granularity=H1 の場合は nil)
+	// 2000 年から今の時間までの間の値を取得する
+	minStart, _ := time.Parse("2006", "2000")
+	maxEnd := time.Now()
 
-	var data PastData
-	err = GetUnmarshal(resp.Body, &data)
-	if err != nil {
-		return nil, errors.Wrap(err, "Error2 at PastData")
+	s := pd.start
+	e := pd.end
+	if pd.start.IsZero() || pd.start.Before(minStart) {
+		s = minStart
+	}
+	if pd.end.IsZero() || pd.end.After(maxEnd) {
+		e = maxEnd
+	}
+
+	var data, tmpData PastData
+	tmpStart := s
+	tmpEnd := tmpStart.AddDate(1, 0, 0)
+	for {
+		if tmpEnd.After(e) {
+			tmpEnd = e
+		}
+
+		resp, err := pd.GetResponse(tmpStart, tmpEnd)
+		if err != nil {
+			return nil, errors.Wrap(err, "Error1 at PastData")
+		}
+
+		err = GetUnmarshal(resp.Body, &tmpData)
+		if err != nil {
+			return nil, errors.Wrap(err, "Error2 at PastData")
+		}
+		resp.Body.Close()
+
+		if data.Candles == nil {
+			data = tmpData
+			data.PairCode = tmpData.PairCode
+			data.Granularity = tmpData.Granularity
+		}
+		data.Candles = append(data.Candles, tmpData.Candles...)
+
+		if tmpEnd == e {
+			break
+		}
+		tmpStart = tmpEnd
+		tmpEnd = tmpStart.AddDate(1, 0, 0)
 	}
 
 	return &data, nil
 }
 
-func (pd *OANDAPastData) GetResponse() (*http.Response, error) {
-	s, err := time.Parse(pd.layout, pd.start)
-	if err != nil {
-		return nil, &ParseTimeError{}
-	}
-	e, err := time.Parse(pd.layout, pd.end)
-	if err != nil {
-		return nil, &ParseTimeError{}
-	}
-
+func (pd *OANDAPastData) GetResponse(start, end time.Time) (*http.Response, error) {
 	values := url.Values{}
 	values.Set("accountId", userID)
 	values.Add("instrument", pd.pairCode)
+	values.Add("start", fmt.Sprint(start.Format(time.RFC3339)))
+	values.Add("end", fmt.Sprint(end.Format(time.RFC3339)))
 	values.Add("granularity", pd.granularity)
-
-	if !s.IsZero() {
-		values.Add("start", fmt.Sprint(s.Format(time.RFC3339)))
-	}
-	if !e.IsZero() {
-		values.Add("end", fmt.Sprint(e.Format(time.RFC3339)))
-	}
 
 	req, err := http.NewRequest("GET", pd.url, nil)
 	if err != nil {

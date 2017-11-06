@@ -129,7 +129,7 @@ Code: EUR_JPY, Ask: 132.725000 Bid: 132.712000
 
 ### Retrieve instrument history
 
-**Cannot get over 5000 historical information (then, the return value is nil)**
+**When Granularity=H1 or more, Cannot get over 5000 historical information (then, the return value is nil)**
 
 * Code
 
@@ -220,6 +220,6 @@ Time: 2017-11-02 10:00:31, Code: USD_JPY, Ask: 114.059000, Bid: 114.055000
 
 ## TODO
 
-* Get more than 5000 historical information for "Retrieve instrument history"
+* When Granularity=H1 or more, Get more than 5000 historical information for "Retrieve instrument history"
 * Add Forex Labs
   * http://developer.oanda.com/rest-live/forex-labs/

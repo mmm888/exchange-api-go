@@ -41,4 +41,4 @@ Available commands are:
 ## TODO
 
 * Add test code
-* Get more than 5000 past data for "oanda past"
+* Use the concurrency in "goanda past"
