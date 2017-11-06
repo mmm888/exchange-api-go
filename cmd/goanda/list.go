@@ -26,12 +26,7 @@ func (l *List) Run(args []string) int {
 		return 1
 	}
 
-	checkNil := &ex.PairList{}
 	for _, v := range data.Instruments {
-		if v == checkNil.Instruments[0] {
-			break
-		}
-
 		fmt.Println(v.Instrument)
 	}
 

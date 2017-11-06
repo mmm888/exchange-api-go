@@ -9,17 +9,19 @@ import (
 )
 
 type PairList struct {
-	Instruments [100]struct {
-		Instrument      string  `json:"instrument"`
-		DisplayName     string  `json:"displayName"`
-		Pip             string  `json:"pip"`
-		MaxTradeUnits   int     `json:"maxTradeUnits"`
-		Precision       string  `json:"precision"`
-		MaxTrailingStop float64 `json:"maxTrailingStop"`
-		MinTrailingStop float64 `json:"minTrailingStop"`
-		MarginRate      float64 `json:"marginRate"`
-		Halted          bool    `json:"halted"`
-	} `json:"instruments"`
+	Instruments []Instrument `json:"instruments"`
+}
+
+type Instrument struct {
+	Instrument      string  `json:"instrument"`
+	DisplayName     string  `json:"displayName"`
+	Pip             string  `json:"pip"`
+	MaxTradeUnits   int     `json:"maxTradeUnits"`
+	Precision       string  `json:"precision"`
+	MaxTrailingStop float64 `json:"maxTrailingStop"`
+	MinTrailingStop float64 `json:"minTrailingStop"`
+	MarginRate      float64 `json:"marginRate"`
+	Halted          bool    `json:"halted"`
 }
 
 type OANDAPairList struct {

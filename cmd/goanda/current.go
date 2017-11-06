@@ -46,12 +46,7 @@ func (l *Current) Run(args []string) int {
 		return 1
 	}
 
-	checkNil := &ex.CurrentData{}
 	for _, v := range data.Prices {
-		if v == checkNil.Prices[0] {
-			break
-		}
-
 		fmt.Printf("Code: %s, Ask: %10f, Bid: %10f\n", v.Instrument, v.Ask, v.Bid)
 	}
 

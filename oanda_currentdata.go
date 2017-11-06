@@ -11,13 +11,15 @@ import (
 )
 
 type CurrentData struct {
-	Prices [100]struct {
-		Instrument string    `json:"instrument"`
-		Time       time.Time `json:"time"`
-		Bid        float64   `json:"bid"`
-		Ask        float64   `json:"ask"`
-		Status     string    `json:"status"`
-	} `json:"prices"`
+	Prices []Price `json:"prices"`
+}
+
+type Price struct {
+	Instrument string    `json:"instrument"`
+	Time       time.Time `json:"time"`
+	Bid        float64   `json:"bid"`
+	Ask        float64   `json:"ask"`
+	Status     string    `json:"status"`
 }
 
 type OANDACurrentData struct {

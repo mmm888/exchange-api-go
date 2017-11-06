@@ -1,6 +1,6 @@
 # goanda
 
-goanda is command line tool of using [exchange-api-go](https://github.com/mmm888/exchange-api-go)
+goanda is command line tool of using [exchange-api-go](https://github.com/mmm888/exchange-api-go|exchange-api-go)
 
 
 ## Build
@@ -23,6 +23,8 @@ mv goanda ${GOPATH}/bin
 ~~~
 
 ## Usage
+
+"goanda influxdb" is used [here](https://github.com/mmm888/exchange-api-docker|exchange-api-docker)
 
 ~~~
 $ goanda --help

@@ -22,15 +22,15 @@ func TestOANDAStreamData_GetDataTest(t *testing.T) {
 	}
 
 	// Check Streaming data
-	var checkStream = &StreamingData{}
 	streamData := "{\"tick\":{\"instrument\":\"USD_JPY\",\"time\":\"2017-09-08T20:59:58.315562Z\",\"bid\":107.832,\"ask\":107.858}}"
 
 	s := new(OANDAStreamData)
 	s.SetData(pairCode)
 	StreamStruct, _, err := s.GetDataTest(streamData)
 
+	var checkStream = &StreamingData{}
 	if *StreamStruct == *checkStream {
-		t.Error("Streaming data is nil")
+		t.Error("Check Streaming data: Streaming data is nil")
 	}
 
 	if err != nil {
@@ -38,15 +38,15 @@ func TestOANDAStreamData_GetDataTest(t *testing.T) {
 	}
 
 	// Check Dummy Data
-	var checkDummy = &DummyData{}
 	dummyData := "{\"heartbeat\":{\"time\":\"2017-09-11T07:12:35.258498Z\"}}"
 
 	d := new(OANDAStreamData)
 	d.SetData(pairCode)
 	_, dummyStruct, err := d.GetDataTest(dummyData)
 
+	var checkDummy = &DummyData{}
 	if *dummyStruct == *checkDummy {
-		t.Error("Dummy data is nil")
+		t.Error("Check Dummy Data: Dummy data is nil")
 	}
 
 	if err != nil {

@@ -19,21 +19,23 @@ type OANDAPastData struct {
 }
 
 type PastData struct {
-	PairCode    string `json:"instrument"`
-	Granularity string `json:"granularity"`
-	Candles     [5000]struct {
-		Time     time.Time `json:time`
-		OpenBid  float64   `json:openBid`
-		OpenAsk  float64   `json:openAsk`
-		HighBid  float64   `json:highBid`
-		HighAsk  float64   `json:highAsk`
-		LowBid   float64   `json:lowBid`
-		LowAsk   float64   `json:lowAsk`
-		CloseBid float64   `json:closeBid`
-		CloseAsk float64   `json:closeAsk`
-		Volume   int       `json:volume`
-		Complete bool      `json:complete`
-	} `json:"candles"`
+	PairCode    string   `json:"instrument"`
+	Granularity string   `json:"granularity"`
+	Candles     []Candle `json:"candles"`
+}
+
+type Candle struct {
+	Time     time.Time `json:time`
+	OpenBid  float64   `json:openBid`
+	OpenAsk  float64   `json:openAsk`
+	HighBid  float64   `json:highBid`
+	HighAsk  float64   `json:highAsk`
+	LowBid   float64   `json:lowBid`
+	LowAsk   float64   `json:lowAsk`
+	CloseBid float64   `json:closeBid`
+	CloseAsk float64   `json:closeAsk`
+	Volume   int       `json:volume`
+	Complete bool      `json:complete`
 }
 
 func (pd *OANDAPastData) SetData(layout, pairCode, start, end, granularity string) {

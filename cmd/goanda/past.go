@@ -49,12 +49,7 @@ func (l *Past) Run(args []string) int {
 		return 1
 	}
 
-	checkNil := &ex.PastData{}
 	for _, v := range data.Candles {
-		if v == checkNil.Candles[0] {
-			break
-		}
-
 		fmt.Printf("Time: %s, Ask: %10f, Bid: %10f\n",
 			v.Time.Format(layout), v.OpenAsk, v.OpenBid)
 	}

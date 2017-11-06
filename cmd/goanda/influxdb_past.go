@@ -48,13 +48,7 @@ func (i *InfluxPast) Run(args []string) int {
 			return 1
 		}
 
-		checkNil := &ex.PastData{}
-
 		for _, v := range data.Candles {
-			if v == checkNil.Candles[0] {
-				break
-			}
-
 			// Create a point and add to batch
 			//tags:=map[string]string{"api":"oanda"}
 			fields := map[string]interface{}{

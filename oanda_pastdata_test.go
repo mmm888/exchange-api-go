@@ -6,8 +6,6 @@ import (
 )
 
 func TestOANDAPastData_GetDatatData_GetData(t *testing.T) {
-	var checkPastData = &PastData{}
-
 	var pairCode = "USD_JPY"
 	var layout = "2006-01-02"
 	var start = "2017-09-25"
@@ -18,7 +16,7 @@ func TestOANDAPastData_GetDatatData_GetData(t *testing.T) {
 	d.SetData(layout, pairCode, start, end, granularity)
 	p, err := d.GetData()
 
-	if *p == *checkPastData {
+	if p.Candles == nil {
 		t.Error("Past Data is nil")
 	}
 

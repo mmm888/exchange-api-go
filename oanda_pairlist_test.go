@@ -9,7 +9,6 @@ import (
 )
 
 func TestOANDAPairList_GetData(t *testing.T) {
-	var checkPairList = &PairList{}
 	var instruments = []string{
 		"USD_JPY",
 		"EUR_JPY",
@@ -31,7 +30,7 @@ func TestOANDAPairList_GetData(t *testing.T) {
 	d.SetData(instruments, fields)
 	p, err := d.GetData()
 
-	if *p == *checkPairList {
+	if p.Instruments == nil {
 		t.Error("PairList is nil")
 	}
 

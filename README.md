@@ -135,7 +135,7 @@ Code: EUR_JPY, Ask: 132.725000 Bid: 132.712000
 
 ~~~
 package main
-
+(default: USD_JPY)
 import (
     "fmt"
     "log"

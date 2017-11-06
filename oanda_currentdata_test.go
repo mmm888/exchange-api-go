@@ -13,8 +13,6 @@ func TestOANDACurrentData_GetData(t *testing.T) {
 	//var layout = "2006-01-02"
 	//var since = "2017-09-25"
 
-	var checkCurrentData = &CurrentData{}
-
 	var instruments = []string{
 		"USD_JPY",
 		"EUR_JPY",
@@ -27,7 +25,7 @@ func TestOANDACurrentData_GetData(t *testing.T) {
 	d.SetData(instruments, layout, since)
 	c, err := d.GetData()
 
-	if *c == *checkCurrentData {
+	if c.Prices == nil {
 		t.Error("Current Data is nil")
 	}
 
