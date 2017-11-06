@@ -29,7 +29,7 @@ $ goanda --help
 Usage: goanda [--version] [--help] <command> [<args>]
 
 Available commands are:
-    current      Get ask, bid now
+    current      Get ask, bid now (default: USD_JPY)
     influxdb     Operate InfluxDB
     list         Show a list of pair code
     past         Get ask, bid from start to end (default: USD_JPY)
@@ -39,5 +39,4 @@ Available commands are:
 ## TODO
 
 * Add test code
-* Add Option for "list, current, past, streaming"
 * Get more than 5000 past data for "oanda past"
